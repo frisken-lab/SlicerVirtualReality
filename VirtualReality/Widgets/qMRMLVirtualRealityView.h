@@ -103,6 +103,10 @@ public:
   // Hacks to limit interaction
   Q_INVOKABLE void EnableDolly3D(bool enable);
   Q_INVOKABLE bool IsDolly3DEnabled();
+  Q_INVOKABLE void SetGestureButtonToTrigger();
+  Q_INVOKABLE void SetGestureButtonToGrip();
+  Q_INVOKABLE void SetGestureButtonToTriggerAndGrip();
+  Q_INVOKABLE void SetGestureButtonToNone();
 
 signals:
   void physicalToWorldMatrixModified();

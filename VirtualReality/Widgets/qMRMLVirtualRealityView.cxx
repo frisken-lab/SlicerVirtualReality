@@ -721,6 +721,30 @@ bool qMRMLVirtualRealityView::IsDolly3DEnabled()
 	return d->InteractorStyle->GetMappedAction(vtkEventDataDevice::RightController, vtkEventDataDeviceInput::TrackPad) == VTKIS_DOLLY;
 }
 
+void qMRMLVirtualRealityView::SetGestureButtonToTrigger()
+{
+	Q_D(qMRMLVirtualRealityView);
+	d->Interactor->SetGestureButtonToTrigger();
+}
+
+void qMRMLVirtualRealityView::SetGestureButtonToGrip()
+{
+	Q_D(qMRMLVirtualRealityView);
+	d->Interactor->SetGestureButtonToGrip();
+}
+
+void qMRMLVirtualRealityView::SetGestureButtonToTriggerAndGrip()
+{
+	Q_D(qMRMLVirtualRealityView);
+	d->Interactor->SetGestureButtonToTriggerAndGrip();
+}
+
+void qMRMLVirtualRealityView::SetGestureButtonToNone()
+{
+	Q_D(qMRMLVirtualRealityView);
+	d->Interactor->SetGestureButtonToNone();
+}
+
 //------------------------------------------------------------------------------
 void qMRMLVirtualRealityView::onPhysicalToWorldMatrixModified()
 {
