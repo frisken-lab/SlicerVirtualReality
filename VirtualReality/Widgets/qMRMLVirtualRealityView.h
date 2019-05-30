@@ -102,6 +102,8 @@ public:
 
 signals:
   void physicalToWorldMatrixModified();
+  void onLeftControllerTriggerPressed();
+  void onLeftControllerTriggerReleased();
 
 public slots:
   /// Set the current \a viewNode to observe

@@ -717,6 +717,15 @@ void qMRMLVirtualRealityView::onButton3DEvent(vtkObject* caller, void* call_data
 	Q_D(qMRMLVirtualRealityView);
 
 	vtkEventDataButton3D * ed = reinterpret_cast<vtkEventDataButton3D*>(call_data);
+
+	if (ed->GetDevice() == vtkEventDataDevice::LeftController &&
+		ed->GetInput() == vtkEventDataDeviceInput::Trigger)
+	{
+		if (ed->GetAction() == vtkEventDataAction::Press)
+			emit onLeftControllerTriggerPressed();
+		else if (ed->GetAction() == vtkEventDataAction::Release)
+			emit onLeftControllerTriggerReleased();
+	}
 	
 	// Device
 	if (ed->GetDevice() == vtkEventDataDevice::LeftController)
