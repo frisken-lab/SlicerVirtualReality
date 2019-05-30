@@ -108,6 +108,7 @@ public slots:
   void setMRMLVirtualRealityViewNode(vtkMRMLVirtualRealityViewNode* newViewNode);
 
   void onPhysicalToWorldMatrixModified();
+  void onButton3DEvent(vtkObject* caller, void* client_data, unsigned long vtk_event, void* call_data);
 
 protected:
 

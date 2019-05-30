@@ -157,6 +157,9 @@ void qMRMLVirtualRealityViewPrivate::createRenderWindow()
   qvtkReconnect(this->RenderWindow, vtkOpenVRRenderWindow::PhysicalToWorldMatrixModified,
                 q, SLOT(onPhysicalToWorldMatrixModified()));
 
+  // Observe button press event
+  qvtkReconnect(this->Interactor, vtkCommand::Button3DEvent, q, SLOT(onButton3DEvent(vtkObject*,void*,unsigned long,void*)));
+
   vtkMRMLVirtualRealityViewDisplayableManagerFactory* factory
     = vtkMRMLVirtualRealityViewDisplayableManagerFactory::GetInstance();
 
@@ -706,6 +709,48 @@ void qMRMLVirtualRealityView::onPhysicalToWorldMatrixModified()
   d->MRMLVirtualRealityViewNode->SetMagnification(d->InteractorStyle->GetMagnification());
 
   emit physicalToWorldMatrixModified();
+}
+
+//------------------------------------------------------------------------------
+void qMRMLVirtualRealityView::onButton3DEvent(vtkObject* caller, void* client_data, unsigned long vtk_event, void* call_data)
+{
+	Q_D(qMRMLVirtualRealityView);
+
+	vtkEventDataButton3D * ed = reinterpret_cast<vtkEventDataButton3D*>(call_data);
+	
+	// Device
+	if (ed->GetDevice() == vtkEventDataDevice::LeftController)
+		std::cout << "VR left controller;";
+	else if (ed->GetDevice() == vtkEventDataDevice::RightController)
+		std::cout << "VR right controller;";
+	else
+		std::cout << "VR unknown controller;";
+
+	// Device input
+	if (ed->GetInput() == vtkEventDataDeviceInput::Trigger)
+		std::cout << " Trigger;";
+	else if (ed->GetInput() == vtkEventDataDeviceInput::Grip)
+		std::cout << " Grip;";
+	else if (ed->GetInput() == vtkEventDataDeviceInput::Joystick)
+		std::cout << " Joystick;";
+	else if (ed->GetInput() == vtkEventDataDeviceInput::TrackPad)
+		std::cout << " TrackPad;";
+	else
+		std::cout << " Unknown device input;";
+
+	// Action
+	if (ed->GetAction() == vtkEventDataAction::Press)
+		std::cout << " Pressed";
+	else if (ed->GetAction() == vtkEventDataAction::Release)
+		std::cout << " Released";
+	else if (ed->GetAction() == vtkEventDataAction::Touch)
+		std::cout << " Touch";
+	else if (ed->GetAction() == vtkEventDataAction::Untouch)
+		std::cout << " Untouch";
+	else
+		std::cout << " Unknown action";
+
+	std::cout << std::endl;
 }
 
 //---------------------------------------------------------------------------
