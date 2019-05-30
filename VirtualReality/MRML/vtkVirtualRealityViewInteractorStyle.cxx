@@ -716,6 +716,15 @@ void vtkVirtualRealityViewInteractorStyle::MapInputToAction(
   this->Modified();
 }
 
+int vtkVirtualRealityViewInteractorStyle::GetMappedAction(vtkEventDataDevice device, vtkEventDataDeviceInput input)
+{
+	if (input >= vtkEventDataDeviceInput::NumberOfInputs || device >= vtkEventDataDevice::NumberOfDevices )
+	{
+		return VTKIS_NONE;
+	}
+	return this->InputMap[static_cast<int>(device)][static_cast<int>(input)];
+}
+
 //----------------------------------------------------------------------------
 void vtkVirtualRealityViewInteractorStyle::StartAction(int state, vtkEventDataDevice3D* edata)
 {

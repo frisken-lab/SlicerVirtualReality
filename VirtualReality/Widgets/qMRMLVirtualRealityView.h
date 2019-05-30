@@ -100,6 +100,10 @@ public:
   /// Get underlying RenderWindow
   Q_INVOKABLE bool isHardwareConnected()const;
 
+  // Hacks to limit interaction
+  Q_INVOKABLE void EnableDolly3D(bool enable);
+  Q_INVOKABLE bool IsDolly3DEnabled();
+
 signals:
   void physicalToWorldMatrixModified();
   void onLeftControllerTriggerPressed();

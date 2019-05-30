@@ -107,6 +107,7 @@ public:
   */
   void MapInputToAction(vtkEventDataDevice device,
     vtkEventDataDeviceInput input, int state);
+  int GetMappedAction(vtkEventDataDevice device, vtkEventDataDeviceInput input);
   //@}
 
   ////@{
