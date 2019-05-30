@@ -175,6 +175,8 @@ bool vtkVirtualRealityViewInteractorStyle::vtkInternal::CalculateCombinedControl
 vtkVirtualRealityViewInteractorStyle::vtkVirtualRealityViewInteractorStyle()
   : DisplayableManagerGroup(nullptr)
 {
+  this->GrabEnabled = 1;
+
   this->Internal = new vtkInternal();
 
   for (int d = 0; d < vtkEventDataNumberOfDevices; ++d)
@@ -503,7 +505,7 @@ void vtkVirtualRealityViewInteractorStyle::StartPositionProp(vtkEventDataDevice3
     }
     //TODO: Only the first selectable picked node in the last displayable manager will be picked
     vtkMRMLNode* pickedNode = displayNode->GetDisplayableNode();
-    if (pickedNode && pickedNode->GetSelectable())
+    if (pickedNode && pickedNode->GetSelectable() && this->GrabEnabled )
     {
       this->Internal->PickedNode[deviceIndex] = pickedNode;
     }

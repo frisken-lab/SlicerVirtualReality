@@ -100,9 +100,18 @@ public:
   /// Get underlying RenderWindow
   Q_INVOKABLE bool isHardwareConnected()const;
 
+  //--------------------------------------------------
   // Hacks to limit interaction
+
+  // enable disable grabbing and moving objects in the scene
+  Q_INVOKABLE void EnableGrabObjects(bool enable);
+  Q_INVOKABLE bool IsGrabObjectsEnabled();
+  
+  // enable/disable dolly (flying in the scene with the TrackPad)
   Q_INVOKABLE void EnableDolly3D(bool enable);
   Q_INVOKABLE bool IsDolly3DEnabled();
+  
+  // Choose which set of buttons is associated with gestures (zoom,pan,rotate and grab)
   Q_INVOKABLE void SetGestureButtonToTrigger();
   Q_INVOKABLE void SetGestureButtonToGrip();
   Q_INVOKABLE void SetGestureButtonToTriggerAndGrip();

@@ -701,6 +701,21 @@ bool qMRMLVirtualRealityView::isHardwareConnected()const
   return true;
 }
 
+void qMRMLVirtualRealityView::EnableGrabObjects(bool enable)
+{
+	Q_D(qMRMLVirtualRealityView);
+	if (enable)
+		d->InteractorStyle->GrabEnabledOn();
+	else
+		d->InteractorStyle->GrabEnabledOff();
+}
+
+bool qMRMLVirtualRealityView::IsGrabObjectsEnabled()
+{
+	Q_D(qMRMLVirtualRealityView);
+	return d->InteractorStyle->GetGrabEnabled() != 0;
+}
+
 void qMRMLVirtualRealityView::EnableDolly3D(bool enable)
 {
 	Q_D(qMRMLVirtualRealityView);

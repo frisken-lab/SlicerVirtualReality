@@ -122,6 +122,10 @@ public:
   //vtkGetMacro(HoverPick, int);
   //vtkBooleanMacro(HoverPick, int);
 
+  vtkSetClampMacro(GrabEnabled, int, 0, 1);
+  vtkGetMacro(GrabEnabled, int);
+  vtkBooleanMacro(GrabEnabled, int);
+
   //int GetInteractionState(vtkEventDataDevice device) {
   //  return this->InteractionState[static_cast<int>(device)]; }
 
@@ -193,6 +197,8 @@ protected:
   //vtkNew<vtkOpenVRHardwarePicker> HardwarePicker;
 
   vtkMRMLDisplayableManagerGroup* DisplayableManagerGroup;
+
+  int GrabEnabled;
 
 protected:
   vtkVirtualRealityViewInteractorStyle();
