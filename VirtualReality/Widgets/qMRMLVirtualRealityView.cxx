@@ -712,7 +712,7 @@ void qMRMLVirtualRealityView::onPhysicalToWorldMatrixModified()
 }
 
 //------------------------------------------------------------------------------
-void qMRMLVirtualRealityView::onButton3DEvent(vtkObject* caller, void* client_data, unsigned long vtk_event, void* call_data)
+void qMRMLVirtualRealityView::onButton3DEvent(vtkObject* caller, void* call_data, unsigned long vtk_event, void* client_data)
 {
 	Q_D(qMRMLVirtualRealityView);
 
