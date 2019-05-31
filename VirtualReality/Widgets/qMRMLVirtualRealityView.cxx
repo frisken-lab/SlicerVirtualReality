@@ -777,48 +777,81 @@ void qMRMLVirtualRealityView::onButton3DEvent(vtkObject* caller, void* call_data
 
 	vtkEventDataButton3D * ed = reinterpret_cast<vtkEventDataButton3D*>(call_data);
 
-	if (ed->GetDevice() == vtkEventDataDevice::LeftController &&
-		ed->GetInput() == vtkEventDataDeviceInput::Trigger)
+	if(ed->GetInput() == vtkEventDataDeviceInput::Trigger)
 	{
-		if (ed->GetAction() == vtkEventDataAction::Press)
-			emit onLeftControllerTriggerPressed();
-		else if (ed->GetAction() == vtkEventDataAction::Release)
-			emit onLeftControllerTriggerReleased();
+		if(ed->GetDevice() == vtkEventDataDevice::LeftController)
+		{
+			if (ed->GetAction() == vtkEventDataAction::Press)
+			{
+				emit LeftControllerTriggerPressed();
+			}
+			else if (ed->GetAction() == vtkEventDataAction::Release)
+			{
+				emit LeftControllerTriggerReleased();
+			}
+		}
+		else if (ed->GetDevice() == vtkEventDataDevice::RightController)
+		{
+			if (ed->GetAction() == vtkEventDataAction::Press)
+			{
+				emit RightControllerTriggerPressed();
+			}
+			else if (ed->GetAction() == vtkEventDataAction::Release)
+			{
+				emit RightControllerTriggerReleased();
+			}
+		}
 	}
-	
-	// Device
-	//if (ed->GetDevice() == vtkEventDataDevice::LeftController)
-	//	std::cout << "VR left controller;";
-	//else if (ed->GetDevice() == vtkEventDataDevice::RightController)
-	//	std::cout << "VR right controller;";
-	//else
-	//	std::cout << "VR unknown controller;";
-
-	//// Device input
-	//if (ed->GetInput() == vtkEventDataDeviceInput::Trigger)
-	//	std::cout << " Trigger;";
-	//else if (ed->GetInput() == vtkEventDataDeviceInput::Grip)
-	//	std::cout << " Grip;";
-	//else if (ed->GetInput() == vtkEventDataDeviceInput::Joystick)
-	//	std::cout << " Joystick;";
-	//else if (ed->GetInput() == vtkEventDataDeviceInput::TrackPad)
-	//	std::cout << " TrackPad;";
-	//else
-	//	std::cout << " Unknown device input;";
-
-	//// Action
-	//if (ed->GetAction() == vtkEventDataAction::Press)
-	//	std::cout << " Pressed";
-	//else if (ed->GetAction() == vtkEventDataAction::Release)
-	//	std::cout << " Released";
-	//else if (ed->GetAction() == vtkEventDataAction::Touch)
-	//	std::cout << " Touch";
-	//else if (ed->GetAction() == vtkEventDataAction::Untouch)
-	//	std::cout << " Untouch";
-	//else
-	//	std::cout << " Unknown action";
-
-	//std::cout << std::endl;
+	else if (ed->GetInput() == vtkEventDataDeviceInput::Grip)
+	{
+		if (ed->GetDevice() == vtkEventDataDevice::LeftController)
+		{
+			if (ed->GetAction() == vtkEventDataAction::Press)
+			{
+				emit LeftControllerGripPressed();
+			}
+			else if (ed->GetAction() == vtkEventDataAction::Release)
+			{
+				emit LeftControllerGripReleased();
+			}
+		}
+		else if (ed->GetDevice() == vtkEventDataDevice::RightController)
+		{
+			if (ed->GetAction() == vtkEventDataAction::Press)
+			{
+				emit RightControllerGripPressed();
+			}
+			else if (ed->GetAction() == vtkEventDataAction::Release)
+			{
+				emit RightControllerGripReleased();
+			}
+		}
+	}
+	else if (ed->GetInput() == vtkEventDataDeviceInput::TrackPad)
+	{
+		if (ed->GetDevice() == vtkEventDataDevice::LeftController)
+		{
+			if (ed->GetAction() == vtkEventDataAction::Press)
+			{
+				emit LeftControllerTrackpadPressed(ed->GetTrackPadPosition()[0],ed->GetTrackPadPosition()[1]);
+			}
+			else if (ed->GetAction() == vtkEventDataAction::Release)
+			{
+				emit LeftControllerTrackpadReleased(ed->GetTrackPadPosition()[0], ed->GetTrackPadPosition()[1]);
+			}
+		}
+		else if (ed->GetDevice() == vtkEventDataDevice::RightController)
+		{
+			if (ed->GetAction() == vtkEventDataAction::Press)
+			{
+				emit RightControllerTrackpadPressed(ed->GetTrackPadPosition()[0], ed->GetTrackPadPosition()[1]);
+			}
+			else if (ed->GetAction() == vtkEventDataAction::Release)
+			{
+				emit RightControllerTrackpadReleased(ed->GetTrackPadPosition()[0], ed->GetTrackPadPosition()[1]);
+			}
+		}
+	}
 }
 
 //---------------------------------------------------------------------------

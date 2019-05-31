@@ -118,9 +118,26 @@ public:
   Q_INVOKABLE void SetGestureButtonToNone();
 
 signals:
+
   void physicalToWorldMatrixModified();
-  void onLeftControllerTriggerPressed();
-  void onLeftControllerTriggerReleased();
+  
+  // Controllers trigger
+  void LeftControllerTriggerPressed();
+  void LeftControllerTriggerReleased();
+  void RightControllerTriggerPressed();
+  void RightControllerTriggerReleased();
+  
+  // Controllers Grip
+  void LeftControllerGripPressed();
+  void LeftControllerGripReleased();
+  void RightControllerGripPressed();
+  void RightControllerGripReleased();
+
+  // Controllers trackpad
+  void LeftControllerTrackpadPressed(double xPos, double yPos);
+  void LeftControllerTrackpadReleased(double xPos, double yPos);
+  void RightControllerTrackpadPressed(double xPos, double yPos);
+  void RightControllerTrackpadReleased(double xPos, double yPos);
 
 public slots:
   /// Set the current \a viewNode to observe
