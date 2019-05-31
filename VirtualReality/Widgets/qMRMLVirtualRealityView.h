@@ -117,6 +117,8 @@ public:
   Q_INVOKABLE void SetGestureButtonToTriggerAndGrip();
   Q_INVOKABLE void SetGestureButtonToNone();
 
+  Q_INVOKABLE void BringWorldToControllers();
+
 signals:
 
   void physicalToWorldMatrixModified();
@@ -143,8 +145,11 @@ public slots:
   /// Set the current \a viewNode to observe
   void setMRMLVirtualRealityViewNode(vtkMRMLVirtualRealityViewNode* newViewNode);
 
+  void updateViewFromParameters(double* sourceViewUp, double* sourcePosition, double* sourceDirectionOfProjection);
+
   void onPhysicalToWorldMatrixModified();
   void onButton3DEvent(vtkObject* caller, void* call_data, unsigned long vtk_event, void* client_data);
+
 
 protected:
 

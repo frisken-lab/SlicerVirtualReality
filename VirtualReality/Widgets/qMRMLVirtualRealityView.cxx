@@ -760,6 +760,101 @@ void qMRMLVirtualRealityView::SetGestureButtonToNone()
 	d->Interactor->SetGestureButtonToNone();
 }
 
+void qMRMLVirtualRealityView::BringWorldToControllers()
+{
+	Q_D(qMRMLVirtualRealityView);
+	
+	// Make sure VR render window, renderer and camera are available
+	if (!d->RenderWindow)
+	{
+		qWarning() << Q_FUNC_INFO << " failed: RenderWindow has not been created";
+		return;
+	}
+	vtkRenderer* ren = static_cast<vtkRenderer*>(d->RenderWindow->GetRenderers()->GetItemAsObject(0));
+	if (!ren)
+	{
+		qWarning() << Q_FUNC_INFO << "The renderer must be set prior to calling InitializeViewFromCamera";
+		return;
+	}
+	vtkOpenVRCamera* cam = vtkOpenVRCamera::SafeDownCast(ren->GetActiveCamera());
+	if (!cam)
+	{
+		qWarning() << Q_FUNC_INFO << "The renderer's active camera must be set prior to calling InitializeViewFromCamera";
+		return;
+	}
+
+	// Debug: Print out current physical settings
+	/*std::cout << "physical scale: " << d->RenderWindow->GetPhysicalScale() << std::endl;
+	double * pt = d->RenderWindow->GetPhysicalTranslation();
+	std::cout << "Physical translation: ( " << pt[0] << ", " << pt[1] << ", " << pt[2] << " )" << std::endl;
+	double * pd = d->RenderWindow->GetPhysicalViewDirection();
+	std::cout << "Physical view dir: ( " << pd[0] << ", " << pd[1] << ", " << pd[2] << " )" << std::endl;
+	double * pv = d->RenderWindow->GetPhysicalViewUp();
+	std::cout << "Physical view up: ( " << pv[0] << ", " << pv[1] << ", " << pv[2] << " )" << std::endl;*/
+	
+	// Get the physical position of the right controller
+	double rightPos[3];
+	vr::TrackedDeviceIndex_t id = d->RenderWindow->GetTrackedDeviceIndexForDevice(vtkEventDataDevice::RightController);
+	vr::TrackedDevicePose_t & poseR = d->RenderWindow->GetTrackedDevicePose(id);
+	for (int i = 0; i < 3; i++)
+	{
+		rightPos[i] = poseR.mDeviceToAbsoluteTracking.m[i][3];
+	}
+	//std::cout << "Right controller pos: ( " << rightPos[0] << ", " << rightPos[1] << ", " << rightPos[2] << " )" << std::endl;
+
+
+	// Get the physical position of the left controller
+	double leftPos[3];
+	vr::TrackedDeviceIndex_t idl = d->RenderWindow->GetTrackedDeviceIndexForDevice(vtkEventDataDevice::LeftController);
+	vr::TrackedDevicePose_t & pose = d->RenderWindow->GetTrackedDevicePose(idl);
+	for (int i = 0; i < 3; i++)
+	{
+		leftPos[i] = pose.mDeviceToAbsoluteTracking.m[i][3];
+	}
+	//std::cout << "Left controller pos: ( " << leftPos[0] << ", " << leftPos[1] << ", " << leftPos[2] << " )" << std::endl;
+
+	// Get the physical position of the HMD
+	double hmdPos[3];
+	vr::TrackedDeviceIndex_t idh = d->RenderWindow->GetTrackedDeviceIndexForDevice(vtkEventDataDevice::HeadMountedDisplay);
+	vr::TrackedDevicePose_t & poseH = d->RenderWindow->GetTrackedDevicePose(idh);
+	for (int i = 0; i < 3; i++)
+	{
+		hmdPos[i] = poseH.mDeviceToAbsoluteTracking.m[i][3];
+	}
+	//std::cout << "HMD pos: ( " << hmdPos[0] << ", " << hmdPos[1] << ", " << hmdPos[2] << " )" << std::endl;
+
+	// Print relative pos of left controller and hmd
+	//std::cout << "HMD to Right: ( " << rightPos[0] - hmdPos[0] << ", " << rightPos[1] - hmdPos[1] << ", " << rightPos[2] - hmdPos[2] << " )" << std::endl;
+
+	double newPhysicalScale = 1000.0; // Default 1x magnification. OpenVR in meters and Slicer in mm
+	double newViewUp[3] = { 0.0, 0.0, 1.0 };
+	double newViewDir[3] = { -1.0, 0.0, 0.0 };
+
+	// Print camera params before the change
+	/*double * cp = cam->GetPosition();
+	std::cout << "Cam pos: ( " << cp[0] << ", " << cp[1] << ", " << cp[2] << " )" << std::endl;
+	double * cf = cam->GetFocalPoint();
+	std::cout << "Cam focal: ( " << cf[0] << ", " << cf[1] << ", " << cf[2] << " )" << std::endl;
+	double * cv = cam->GetViewUp();
+	std::cout << "Cam view up: ( " << cv[0] << ", " << cv[1] << ", " << cv[2] << " )" << std::endl;
+	std::cout << std::endl;*/
+
+	// Reset world camera
+	cam->SetViewUp(0.0, 0.0, 1.0);
+	cam->SetFocalPoint(0.0,0.0,0.0);
+	cam->SetPosition(400.0, 0.0, 0.0);
+	
+	// reset world to physical transform
+	d->RenderWindow->SetPhysicalViewUp(newViewUp);
+	d->RenderWindow->SetPhysicalTranslation(newPhysicalScale * rightPos[2],
+		newPhysicalScale * rightPos[0],
+		newPhysicalScale * rightPos[1]);
+	d->RenderWindow->SetPhysicalViewDirection(newViewDir);
+	d->RenderWindow->SetPhysicalScale(newPhysicalScale);
+
+	ren->ResetCameraClippingRange();
+}
+
 //------------------------------------------------------------------------------
 void qMRMLVirtualRealityView::onPhysicalToWorldMatrixModified()
 {
@@ -919,6 +1014,77 @@ void qMRMLVirtualRealityView::updateViewFromReferenceViewCamera()
     viewUp[2] * newPhysicalScale - sourcePosition[2]);
 
   double* sourceDirectionOfProjection = sourceCamera->GetDirectionOfProjection();
+  d->RenderWindow->SetPhysicalViewDirection(sourceDirectionOfProjection);
+  double* idop = d->RenderWindow->GetPhysicalViewDirection();
+  cam->SetPosition(
+    -idop[0] * newPhysicalScale + sourcePosition[0],
+    -idop[1] * newPhysicalScale + sourcePosition[1],
+    -idop[2] * newPhysicalScale + sourcePosition[2]);
+
+  d->RenderWindow->SetPhysicalScale(newPhysicalScale);
+
+  ren->ResetCameraClippingRange();
+}
+
+void qMRMLVirtualRealityView::updateViewFromParameters(double* sourceViewUp, double* sourcePosition, double* sourceDirectionOfProjection)
+{
+  Q_D(qMRMLVirtualRealityView);
+  if (!d->MRMLVirtualRealityViewNode)
+  {
+    return;
+  }
+  vtkMRMLViewNode* refrenceViewNode = d->MRMLVirtualRealityViewNode->GetReferenceViewNode();
+  if (!refrenceViewNode)
+  {
+    qWarning() << Q_FUNC_INFO << " failed: no reference view node is set";
+    return;
+  }
+  if (!d->CamerasLogic)
+  {
+    qWarning() << Q_FUNC_INFO << " failed: cameras module logic is not set";
+    return;
+  }
+  vtkMRMLCameraNode* cameraNode = d->CamerasLogic->GetViewActiveCameraNode(refrenceViewNode);
+  if (!cameraNode || !cameraNode->GetCamera())
+  {
+    qWarning() << Q_FUNC_INFO << " failed: camera node is not found";
+    return;
+  }
+  if (!d->RenderWindow)
+  {
+    qWarning() << Q_FUNC_INFO << " failed: RenderWindow has not been created";
+    return;
+  }
+
+  // The following is based on d->RenderWindow->InitializeViewFromCamera(sourceCamera),
+  // but that is not usable for us, as it puts the headset in the focal point (so we
+  // need to step back to see the full content) and snaps view direction to the closest axis.
+
+  vtkRenderer* ren = static_cast<vtkRenderer*>(d->RenderWindow->GetRenderers()->GetItemAsObject(0));
+  if (!ren)
+  {
+    qWarning() << Q_FUNC_INFO << "The renderer must be set prior to calling InitializeViewFromCamera";
+    return;
+  }
+  vtkOpenVRCamera* cam = vtkOpenVRCamera::SafeDownCast(ren->GetActiveCamera());
+  if (!cam)
+  {
+    qWarning() << Q_FUNC_INFO << "The renderer's active camera must be set prior to calling InitializeViewFromCamera";
+    return;
+  }
+
+  double newPhysicalScale = 100.0; // Default 10x magnification
+
+  cam->SetViewUp(sourceViewUp);
+  d->RenderWindow->SetPhysicalViewUp(sourceViewUp);
+
+  double* viewUp = cam->GetViewUp();
+  cam->SetFocalPoint(sourcePosition);
+  d->RenderWindow->SetPhysicalTranslation(
+    viewUp[0] * newPhysicalScale - sourcePosition[0],
+    viewUp[1] * newPhysicalScale - sourcePosition[1],
+    viewUp[2] * newPhysicalScale - sourcePosition[2]);
+
   d->RenderWindow->SetPhysicalViewDirection(sourceDirectionOfProjection);
   double* idop = d->RenderWindow->GetPhysicalViewDirection();
   cam->SetPosition(
